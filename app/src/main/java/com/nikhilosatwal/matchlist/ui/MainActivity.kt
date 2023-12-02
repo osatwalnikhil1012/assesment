@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         matchesViewModel.matches.observe(this, Observer { response ->
             when(response) {
                 is Resource.Success -> {
-                    //hideProgressBar()
                     response.data?.let { matchesResponse ->
                         allMatchList = matchesResponse.data
                         for (data in matchesResponse.data) {
@@ -63,13 +62,11 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 is Resource.Error -> {
-                    //hideProgressBar()
                     response.message?.let { message ->
                         Toast.makeText(this, "Error Occured: $message", Toast.LENGTH_LONG).show()
                     }
                 }
                 is Resource.Loading -> {
-                    //showProgressBar()
                 }
             }
         })
@@ -77,15 +74,15 @@ class MainActivity : AppCompatActivity() {
         binding.toggle.addOnButtonCheckedListener { group, checkedId, isChecked ->
 
             if (isChecked) {
+                cricketList.clear()
+                tennisList.clear()
+                soccerList.clear()
                 when(checkedId) {
                     R.id.inPlayButton -> {
                         for (data in allMatchList) {
                             val openDate = data.openDate
                             val openDateMilli = convertDateStringToMilliseconds(openDate)
                             val currentTime = System.currentTimeMillis()
-                            cricketList.clear()
-                            tennisList.clear()
-                            soccerList.clear()
                             if (openDateMilli <= currentTime) {
                                 when(data.sportId) {
                                     "1" -> soccerList.add(data)
@@ -94,18 +91,13 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                        cricketAdapter.notifyDataSetChanged()
-                        tennisAdapter.notifyDataSetChanged()
-                        soccerAdapter.notifyDataSetChanged()
+                        println()
                     }
                     R.id.todayButton -> {
                         for (data in allMatchList) {
                             val openDate = data.openDate
                             val openDateMilli = convertDateStringToMilliseconds(openDate)
                             val currentTime = System.currentTimeMillis()
-                            cricketList.clear()
-                            tennisList.clear()
-                            soccerList.clear()
                             if (openDateMilli > currentTime && openDateMilli<getTomorrowInMillis()) {
                                 when(data.sportId) {
                                     "1" -> soccerList.add(data)
@@ -114,18 +106,12 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                        cricketAdapter.notifyDataSetChanged()
-                        tennisAdapter.notifyDataSetChanged()
-                        soccerAdapter.notifyDataSetChanged()
                     }
                     R.id.tomorrowButton -> {
                         for (data in allMatchList) {
                             val openDate = data.openDate
                             val openDateMilli = convertDateStringToMilliseconds(openDate)
                             val currentTime = System.currentTimeMillis()
-                            cricketList.clear()
-                            tennisList.clear()
-                            soccerList.clear()
                             if (openDateMilli>getTomorrowInMillis()) {
                                 when(data.sportId) {
                                     "1" -> soccerList.add(data)
@@ -134,13 +120,15 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                        cricketAdapter.notifyDataSetChanged()
-                        tennisAdapter.notifyDataSetChanged()
-                        soccerAdapter.notifyDataSetChanged()
                     }
                 }
             }
-
+            tennisAdapter.notifyDataSetChanged()
+            cricketAdapter.notifyDataSetChanged()
+            soccerAdapter.notifyDataSetChanged()
+//            binding.cricketRv.adapter = MatchesAdapter(this, cricketList)
+//            binding.tennisRv.adapter = MatchesAdapter(this, tennisList)
+//            binding.soccerRv.adapter = MatchesAdapter(this, soccerList)
         }
     }
     fun convertDateStringToMilliseconds(dateString: String): Long {
